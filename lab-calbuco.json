@@ -1,0 +1,232 @@
+{
+  "name": "Lab Calbuco",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "9be2ae71-8065-460e-af29-66002d4153cd",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { documento: 'OC-9102', monto_total: 320000 } },\n  { json: { documento: 'Factura 4521', monto_total: 1250000 } },\n  { json: { documento: 'Corrupto', monto_total: null } },\n  { json: { documento: 'Borde', monto_total: 500000 } },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        200
+      ],
+      "id": "323e4ba9-7739-46be-9942-efdf8b3b4163",
+      "name": "Documentos de prueba"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "06d63689-248d-4548-bc3b-285ed34abe2d",
+              "leftValue": "={{ $json.monto_total }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        200
+      ],
+      "id": "c89ed586-11ba-419e-aa80-1f0b2e4b9f8b",
+      "name": "Datos completos"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "85e288f4-1e6a-4be8-a2a2-32bc8aa8a361",
+              "leftValue": "={{ $json.monto_total }}",
+              "rightValue": 500000,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        100
+      ],
+      "id": "f3e18523-709a-4a89-b553-1718d4481c12",
+      "name": "Supera umbral"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "06ede6cf-c147-4a5e-8597-96e76956345c",
+              "name": "estado",
+              "value": "Pendiente",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        0
+      ],
+      "id": "1724edf0-4097-45b0-999e-cb07e3472ae0",
+      "name": "Estado pendiente"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "05868dd7-62fd-4836-9543-259ee4b5a614",
+              "name": "estado",
+              "value": "Aprobado",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        200
+      ],
+      "id": "35a50960-76af-4a98-bd46-a6d8e104a4d9",
+      "name": "Estado aprobado"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c641f685-6b30-4a92-97fb-0c43417ef976",
+              "name": "estado",
+              "value": "Contingencia",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        360
+      ],
+      "id": "68794e3d-1a96-4dab-91ff-052326e85138",
+      "name": "Estado contingencia"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Documentos de prueba",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Documentos de prueba": {
+      "main": [
+        [
+          {
+            "node": "Datos completos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datos completos": {
+      "main": [
+        [
+          {
+            "node": "Supera umbral",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Estado contingencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supera umbral": {
+      "main": [
+        [
+          {
+            "node": "Estado pendiente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Estado aprobado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
